@@ -1,9 +1,9 @@
-# Getting started
+# Base project API
 ## Prerequisites
 - install PHP 8.1
 - install composer
 
-# Getting started
+## Getting started
 - clone project
 - composer install
 - cp .env.example .env
