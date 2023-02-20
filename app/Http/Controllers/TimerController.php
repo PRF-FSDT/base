@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Timer;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class TimerController extends Controller
 {
@@ -12,9 +13,30 @@ class TimerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Timer::all();
+        //validation
+        $request->validate([
+            'date' => 'nullable|date_format:Ymd',
+            'user' => 'nullable|integer',
+        ]);
+
+        $query = Timer::query();
+
+        //date filter
+        if ($request->has('date')) { 
+            $date = Carbon::createFromFormat('Ymd', $request->date);
+
+            $query = $query->whereDate('started_at', '>', $date->clone()->startOfWeek()->subSecond()->format("Y-m-d H:i:s"))
+                ->whereDate('started_at', '<', $date->clone()->endOfWeek()->format("Y-m-d H:i:s"));
+        }
+
+        //user filter
+        if ($request->has('user')) { 
+            $query = $query->where('user_id', $request->user);
+        }
+
+        return $query->get();
     }
 
     /**
